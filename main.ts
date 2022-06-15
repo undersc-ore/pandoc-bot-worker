@@ -8,7 +8,13 @@ import {
 //       https://deno.land/x/bson@v0.1.3
 import { Bson } from "https://deno.land/x/mongo@v0.30.0/mod.ts";
 
-const conn = await connect("amqp://localhost:5672");
+const amqp_url = Deno.env.get("AMQP_URL");
+if (!amqp_url) {
+  console.error("No AMQP_URL provided");
+  Deno.exit(1);
+}
+
+const conn = await connect(amqp_url);
 
 console.log(conn);
 
