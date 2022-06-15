@@ -68,6 +68,7 @@ await channel.consume(
       req.from_filetype,
       "--to",
       req.to_filetype,
+      "--sandbox",
     ];
     const proc = Deno.run({ cmd, stdout: "piped" });
     const { code } = await proc.status();
