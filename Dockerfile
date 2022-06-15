@@ -1,12 +1,15 @@
-FROM pandoc/latex:latest-ubuntu
+FROM rust:alpine AS builder
 
-RUN apt-get update && \
-    apt-get install -y curl unzip && \
-    curl -fsSL https://deno.land/x/install/install.sh | sh
+COPY . /build
+WORKDIR /build
+RUN apk update && \
+    apk add musl-dev && \
+    cargo build --release
 
-ENV DENO_INSTALL="/root/.deno"
-ENV PATH="/root/.deno/bin:${PATH}"
 
-COPY ./main.ts /app/
-WORKDIR /app/
-ENTRYPOINT [ "deno", "run", "--allow-net", "--allow-run", "--allow-write", "--allow-read", "--allow-env", "/app/main.ts" ]
+FROM pandoc/latex:latest
+
+COPY --from=builder /build/target/release/pandoc-bot-worker /root/
+
+WORKDIR /root/
+ENTRYPOINT [ "/root/pandoc-bot-worker" ]
