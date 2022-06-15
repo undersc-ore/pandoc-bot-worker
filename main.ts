@@ -81,9 +81,10 @@ await channel.consume(
       console.log(`Pandoc subprocess succeeded for ${req.file_id}`);
 
       // Reply to queue
-      await channel.publish(
+      const pub_channel = await conn.openChannel();
+      await pub_channel.publish(
         { routingKey: outputQueueName },
-        { contentType: "application/bson" },
+        { contentType: "application/octet-stream" },
         Bson.serialize({
           chat_id: req.chat_id,
           file: out_file_bytes,
